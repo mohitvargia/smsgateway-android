@@ -112,9 +112,11 @@ public class BOSHConnection extends Service {
     	Log.i("gw", "handleError()");
     	// Don't continue trying to log in with bad credentials.
     	if (authFailed) {
+    		Log.i("gw", "auth failed error");
     		return;
     	}
 
+    	Log.i("gw", "schedling retry in " + delays[delay] + " seconds");
     	TimerTask task = new TimerTask() {
     		public void run() {
     			Log.i("gw", "retrying");
@@ -122,7 +124,7 @@ public class BOSHConnection extends Service {
     		}
     	};
     	new Timer().schedule(task, delays[delay]*1000);
-    	delay = Math.max(delays.length-1, delay+1);
+    	delay = Math.min(delays.length-1, delay+1);
     }
 
     private void handleChatCreated(Chat chat) {
@@ -136,6 +138,7 @@ public class BOSHConnection extends Service {
 
     /** Handle an outgoing SMS message. */
     private void handleMessage(Message message) {
+    	Log.i("gw", "handleMessage()");
     	IPacket body = message.getFirstChild("body");
     	String  to   = body.getAttribute("to");
     	String  msg  = body.getText();
@@ -151,6 +154,7 @@ public class BOSHConnection extends Service {
     	Chat chat = chatManager.open(XmppURI.uri("android-sms.localhost"));
 
     	while (! incoming.isEmpty()) {
+    		Log.i("gw", "running spool");
     		Message message = new Message(null, chat.getURI(), null);
     		IPacket body    = message.addChild("body", null);
 
@@ -177,16 +181,18 @@ public class BOSHConnection extends Service {
     		authFailed = true;
     		return;
     	}
-    	session.login(XmppURI.uri(queue, "localhost", "android-sms"), password);
+    	session.login(XmppURI.uri(queue, "localhost", "android"), password);
     }
 
     private void enqueue(String from, String body) {
         // Only enqueue messages from other phones, so that we can use email as a "wake-up".
         if (from.matches(".*\\d{9,}")) {
+        	Log.i("gw", "spooling message");
             incoming.add(new QMsg(from, body));
         }
 
         if (session.isLoggedIn()) {
+        	Log.i("gw", "sending messages");
         	handleReady();
         }
         if (! connection.isConnected()) {
