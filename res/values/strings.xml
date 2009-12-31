@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="main_title">LibraryH3lp SMS</string>
+    <string name="app_name">LibraryH3lp SMS Gateway</string>
+    <string name="start_label">Start</string>
+    <string name="stop_label">Stop</string>
+    <string name="about_label">About</string>
+    <string name="exit_label">Exit</string>
+    <string name="about_title">About SMS Gateway</string>
+    <string name="about_text">\
+Connects your phone\'s SMS to the LibraryH3lp chat system.
+    </string>
+    <string name="settings_label">Settings...</string> 
+    <string name="settings_title">Gateway settings</string> 
+    <string name="settings_shortcut">s</string> 
+    <string name="status_failed_auth">failed authorization</string>
+    <string name="status_failed_connect">failed to connect</string>
+    <string name="status_not_running">not running</string>
+    <string name="status_disconnected">stopped</string>
+    <string name="status_connecting">connecting</string>
+    <string name="status_authorizing">authorizing</string>
+    <string name="status_connected">started</string>
+</resources>
