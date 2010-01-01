@@ -22,23 +22,23 @@
 package com.calclab.emite.core.client.services.android;
 
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+
+import android.os.Handler;
 
 import com.calclab.emite.core.client.services.ScheduledAction;
 
 public class AndroidScheduler {
+	public static long getCurrentTime() {
+		return new Date().getTime();
+	}
 
-    public static long getCurrentTime() {
-	return new Date().getTime();
-    }
+	public static void schedule(final int msecs, final ScheduledAction action) {
+		handler.postDelayed(new Runnable() {
+			public void run() {
+				action.run();
+			}
+		}, msecs);
+	}
 
-    public static void schedule(final int msecs, final ScheduledAction action) {
-    	TimerTask task = new TimerTask() {
-    		public void run() {
-    			action.run();
-    		}
-    	};
-    	new Timer().schedule(task, msecs);
-    }
+	private static final Handler handler = new Handler();
 }

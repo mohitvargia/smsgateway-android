@@ -139,12 +139,15 @@ public class BOSHConnection extends Service {
     /** Handle an outgoing SMS message. */
     private void handleMessage(Message message) {
     	Log.i("gw", "handleMessage()");
-    	IPacket body = message.getFirstChild("body");
-    	String  to   = body.getAttribute("to");
-    	String  msg  = body.getText();
-
-    	SmsManager manager = SmsManager.getDefault();
-    	manager.sendMultipartTextMessage(to, null, manager.divideMessage(msg), null, null);
+    	try {
+	    	IPacket body = message.getFirstChild("body");
+	    	String  to   = body.getAttribute("to");
+	    	String  msg  = body.getText();
+	
+	    	SmsManager manager = SmsManager.getDefault();
+	    	manager.sendMultipartTextMessage(to, null, manager.divideMessage(msg), null, null);
+    	} catch (Exception e) {
+    	}
     }
 
     /** Send any queued messages. */

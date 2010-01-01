@@ -12,8 +12,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 public class SMSGateway extends Activity implements OnClickListener, ServiceConnection {
-    // public final static String TAG = "SMSGateway";
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,16 +27,12 @@ public class SMSGateway extends Activity implements OnClickListener, ServiceConn
     public void onClick(View v) {
         switch (v.getId()) {
         case R.id.start_button:
-            //bindService(new Intent(this, BOSHConnection.class), this, Context.BIND_AUTO_CREATE);
             startService(new Intent(this, BOSHConnection.class));
             if (status != null) {
             	status.update(Status.CONNECTED);
             }
             break;
         case R.id.stop_button:
-            //if (service != null) {
-            //    unbindService(this);
-            //}
             stopService(new Intent(this, BOSHConnection.class));
             if (status != null) {
             	status.update(Status.DISCONNECTED);
@@ -68,13 +62,10 @@ public class SMSGateway extends Activity implements OnClickListener, ServiceConn
     }
 
     public void onServiceConnected(ComponentName name, IBinder service) {
-        //this.service = (BOSHConnection.LocalBinder) service;
     }
 
     public void onServiceDisconnected(ComponentName name) {
-        //this.service = null;
     }
 
-    //private BOSHConnection.LocalBinder service = null;
     private StatusTextView status = null;
 }

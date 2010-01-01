@@ -65,13 +65,11 @@ public class BoshConnection implements Connection {
 
 			public void onError(final String request, final Throwable throwable) {
 				if (running) {
-					Logger.debug("Connection error (total: {0}): {1}", errors,
-							throwable);
+					Logger.debug("Connection error (total: {0}): {1}", errors, throwable);
 					errors++;
 					if (errors > 2) {
 						running = false;
-						onError.fire("Connection error: "
-								+ throwable.toString());
+						onError.fire("Connection error: " + throwable.toString());
 					} else {
 						Logger.debug("Error retry: " + throwable);
 						send(request);
@@ -79,26 +77,27 @@ public class BoshConnection implements Connection {
 				}
 			}
 
-			public void onResponseReceived(final int statusCode,
-					final String content) {
-				errors = 0;
-				activeConnections--;
-				if (running) {
-					if (statusCode != 200) {
-						running = false;
-						onError.fire("Bad status: " + statusCode);
-					} else {
-						onResponse.fire(content);
-						final IPacket response = services.toXML(content);
-						if (response != null
-								&& "body".equals(response.getName())) {
-							handleResponse(response);
+			public void onResponseReceived(final int statusCode, final String content) {
+				try {
+					errors = 0;
+					activeConnections--;
+					if (running) {
+						if (statusCode != 200) {
+							running = false;
+							onError.fire("Bad status: " + statusCode);
 						} else {
-							onError.fire("Bad response: " + content);
+							onResponse.fire(content);
+							final IPacket response = services.toXML(content);
+							if (response != null
+									&& "body".equals(response.getName())) {
+								handleResponse(response);
+							} else {
+								onError.fire("Bad response: " + content);
+							}
 						}
 					}
+				} catch (Exception e) {
 				}
-
 			}
 		};
 	}
@@ -188,7 +187,7 @@ public class BoshConnection implements Connection {
 			} else {
 				final long currentRID = stream.rid;
 				// FIXME: hardcoded
-				final int msecs = 1000;
+				final int msecs = 6000;
 				services.schedule(msecs, new ScheduledAction() {
 					public void run() {
 						if (body == null && stream.rid == currentRID) {

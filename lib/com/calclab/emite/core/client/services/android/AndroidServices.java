@@ -28,24 +28,24 @@ import com.calclab.emite.core.client.services.ScheduledAction;
 import com.calclab.emite.core.client.services.Services;
 
 public class AndroidServices implements Services {
-    public long getCurrentTime() {
-	return AndroidScheduler.getCurrentTime();
-    }
+	public long getCurrentTime() {
+		return AndroidScheduler.getCurrentTime();
+	}
 
-    public void schedule(final int msecs, final ScheduledAction action) {
-	AndroidScheduler.schedule(msecs, action);
-    }
+	public void schedule(final int msecs, final ScheduledAction action) {
+		AndroidScheduler.schedule(msecs, action);
+	}
 
-    public void send(final String httpBase, final String request, final ConnectorCallback listener)
-        throws ConnectorException {
-	AndroidConnector.send(httpBase, request, listener);
-    }
+	public void send(final String httpBase, final String request,
+			final ConnectorCallback listener) throws ConnectorException {
+		AndroidConnector.send(httpBase, request, listener);
+	}
 
-    public String toString(final IPacket packet) {
-	return AndroidXMLService.toString(packet);
-    }
+	public String toString(final IPacket packet) {
+		return AndroidXMLService.toString(packet);
+	}
 
-    public IPacket toXML(final String xml) {
-	return AndroidXMLService.toXML(xml);
-    }
+	public IPacket toXML(final String xml) {
+		return AndroidXMLService.toXML(xml);
+	}
 }
