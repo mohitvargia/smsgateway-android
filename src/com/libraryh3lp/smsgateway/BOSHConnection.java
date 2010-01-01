@@ -140,12 +140,16 @@ public class BOSHConnection extends Service {
     private void handleMessage(Message message) {
     	Log.i("gw", "handleMessage()");
     	try {
-	    	IPacket body = message.getFirstChild("body");
+	    	IPacket body = message.getFirstChild("sms");
 	    	String  to   = body.getAttribute("to");
 	    	String  msg  = body.getText();
-	
-	    	SmsManager manager = SmsManager.getDefault();
-	    	manager.sendMultipartTextMessage(to, null, manager.divideMessage(msg), null, null);
+
+        	Log.i("gw", "outgoing message: " + to + " " + msg);
+	        if (to.matches(".*\\d{9,}")) {
+	        	Log.i("gw", "really sending now");
+	        	SmsManager manager = SmsManager.getDefault();
+	        	manager.sendMultipartTextMessage(to, null, manager.divideMessage(msg), null, null);
+	        }
     	} catch (Exception e) {
     	}
     }
@@ -159,7 +163,7 @@ public class BOSHConnection extends Service {
     	while (! incoming.isEmpty()) {
     		Log.i("gw", "running spool");
     		Message message = new Message(null, chat.getURI(), null);
-    		IPacket body    = message.addChild("body", null);
+    		IPacket body    = message.addChild("sms", null);
 
     		QMsg msg = incoming.remove();
     		body.setAttribute("from", msg.from);
