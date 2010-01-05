@@ -26,57 +26,57 @@ import java.util.List;
 
 public abstract class AbstractPacket implements IPacket {
 
-    public List<? extends IPacket> getChildren(final PacketMatcher filter) {
-	final List<IPacket> list = new ArrayList<IPacket>();
-	for (final IPacket child : getChildren()) {
-	    if (filter.matches(child)) {
-		list.add(child);
-	    }
+	public List<? extends IPacket> getChildren(final PacketMatcher filter) {
+		final List<IPacket> list = new ArrayList<IPacket>();
+		for (final IPacket child : getChildren()) {
+			if (filter.matches(child)) {
+				list.add(child);
+			}
+		}
+		return list;
 	}
-	return list;
-    }
 
-    public List<? extends IPacket> getChildren(final String name) {
-	return getChildren(MatcherFactory.byName(name));
-    }
-
-    public IPacket getFirstChild(final PacketMatcher filter) {
-	for (final IPacket child : getChildren()) {
-	    if (filter.matches(child)) {
-		return child;
-	    }
+	public List<? extends IPacket> getChildren(final String name) {
+		return getChildren(MatcherFactory.byName(name));
 	}
-	return NoPacket.INSTANCE;
-    }
 
-    public IPacket getFirstChild(final String name) {
-	return getFirstChild(MatcherFactory.byName(name));
-    }
+	public IPacket getFirstChild(final PacketMatcher filter) {
+		for (final IPacket child : getChildren()) {
+			if (filter.matches(child)) {
+				return child;
+			}
+		}
+		return NoPacket.INSTANCE;
+	}
 
-    public boolean hasAttribute(final String name) {
-	return getAttribute(name) != null;
-    }
+	public IPacket getFirstChild(final String name) {
+		return getFirstChild(MatcherFactory.byName(name));
+	}
 
-    public boolean hasAttribute(final String name, final String value) {
-	return value.equals(getAttribute(name));
-    }
+	public boolean hasAttribute(final String name) {
+		return getAttribute(name) != null;
+	}
 
-    public boolean hasChild(final String name) {
-	return getFirstChild(name) != NoPacket.INSTANCE;
-    }
+	public boolean hasAttribute(final String name, final String value) {
+		return value.equals(getAttribute(name));
+	}
 
-    public IPacket With(final String name, final long value) {
-	return With(name, String.valueOf(value));
-    }
+	public boolean hasChild(final String name) {
+		return getFirstChild(name) != NoPacket.INSTANCE;
+	}
 
-    public IPacket With(final String name, final String value) {
-	setAttribute(name, value);
-	return this;
-    }
+	public IPacket With(final String name, final long value) {
+		return With(name, String.valueOf(value));
+	}
 
-    public IPacket WithText(final String text) {
-	setText(text);
-	return this;
-    }
+	public IPacket With(final String name, final String value) {
+		setAttribute(name, value);
+		return this;
+	}
+
+	public IPacket WithText(final String text) {
+		setText(text);
+		return this;
+	}
 
 }

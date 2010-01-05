@@ -57,6 +57,8 @@ public interface IPacket {
 	 */
 	List<? extends IPacket> getChildren(PacketMatcher matcher);
 
+	List<? extends IPacket> getChildren(String name);
+
 	/**
 	 * Returns the first children that matches the matcher
 	 * 

@@ -29,71 +29,71 @@ import com.calclab.emite.core.client.packet.NoPacket;
 import com.calclab.emite.core.client.packet.Packet;
 
 public class BasicStanza extends DelegatedPacket implements Stanza {
-    protected static final String TYPE = "type";
-    private static final String FROM = "from";
-    private static final String ID = "id";
-    private static final String TO = "to";
+	protected static final String TYPE = "type";
+	private static final String FROM = "from";
+	private static final String ID = "id";
+	private static final String TO = "to";
 
-    public BasicStanza(final IPacket stanza) {
-	super(stanza);
-    }
-
-    public BasicStanza(final String name, final String xmlns) {
-	super(new Packet(name, xmlns));
-    }
-
-    public XmppURI getFrom() {
-	return uri(getAttribute(FROM));
-    }
-
-    public String getFromAsString() {
-	return getAttribute(FROM);
-    }
-
-    public String getId() {
-	return getAttribute(ID);
-    }
-
-    public XmppURI getTo() {
-	return uri(getToAsString());
-    }
-
-    public String getToAsString() {
-	return getAttribute(TO);
-    }
-
-    public void setFrom(final XmppURI from) {
-	setAttribute(FROM, (from != null ? from.toString() : null));
-    }
-
-    public void setId(final String id) {
-	setAttribute(ID, id);
-    }
-
-    public void setTo(final XmppURI to) {
-	setAttribute(TO, (to != null ? to.toString() : null));
-    }
-
-    public void setType(final String type) {
-	setAttribute(TYPE, type);
-    }
-
-    /**
-     * Add a child with a specified text. Create the child if not exists. If the
-     * text is null, then removes the child
-     * 
-     * @param nodeName
-     * @param text
-     */
-    protected void setTextToChild(final String nodeName, final String text) {
-	if (text != null) {
-	    IPacket node = getFirstChild(nodeName);
-	    if (node == NoPacket.INSTANCE) {
-		node = this.addChild(nodeName, null);
-	    }
-	    node.setText(text);
-	} else {
-	    removeChild(getFirstChild(nodeName));
+	public BasicStanza(final IPacket stanza) {
+		super(stanza);
 	}
-    }
+
+	public BasicStanza(final String name, final String xmlns) {
+		super(new Packet(name, xmlns));
+	}
+
+	public XmppURI getFrom() {
+		return uri(getAttribute(FROM));
+	}
+
+	public String getFromAsString() {
+		return getAttribute(FROM);
+	}
+
+	public String getId() {
+		return getAttribute(ID);
+	}
+
+	public XmppURI getTo() {
+		return uri(getToAsString());
+	}
+
+	public String getToAsString() {
+		return getAttribute(TO);
+	}
+
+	public void setFrom(final XmppURI from) {
+		setAttribute(FROM, (from != null ? from.toString() : null));
+	}
+
+	public void setId(final String id) {
+		setAttribute(ID, id);
+	}
+
+	public void setTo(final XmppURI to) {
+		setAttribute(TO, (to != null ? to.toString() : null));
+	}
+
+	public void setType(final String type) {
+		setAttribute(TYPE, type);
+	}
+
+	/**
+	 * Add a child with a specified text. Create the child if not exists. If the
+	 * text is null, then removes the child
+	 * 
+	 * @param nodeName
+	 * @param text
+	 */
+	protected void setTextToChild(final String nodeName, final String text) {
+		if (text != null) {
+			IPacket node = getFirstChild(nodeName);
+			if (node == NoPacket.INSTANCE) {
+				node = this.addChild(nodeName, null);
+			}
+			node.setText(text);
+		} else {
+			removeChild(getFirstChild(nodeName));
+		}
+	}
 }

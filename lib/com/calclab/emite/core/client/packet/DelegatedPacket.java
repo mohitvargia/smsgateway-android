@@ -25,87 +25,88 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DelegatedPacket implements IPacket {
-    private final IPacket delegate;
+	private final IPacket delegate;
 
-    public DelegatedPacket(final IPacket delegate) {
-	this.delegate = delegate;
-    }
+	public DelegatedPacket(final IPacket delegate) {
+		this.delegate = delegate;
+	}
 
-    public final IPacket addChild(final String nodeName, final String xmlns) {
-	return delegate.addChild(nodeName, xmlns);
-    }
+	public final IPacket addChild(final String nodeName, final String xmlns) {
+		return delegate.addChild(nodeName, xmlns);
+	}
 
-    public final String getAttribute(final String name) {
-	return delegate.getAttribute(name);
-    }
+	public final String getAttribute(final String name) {
+		return delegate.getAttribute(name);
+	}
 
-    public HashMap<String, String> getAttributes() {
-	return delegate.getAttributes();
-    }
+	public HashMap<String, String> getAttributes() {
+		return delegate.getAttributes();
+	}
 
-    public List<? extends IPacket> getChildren() {
-	return delegate.getChildren();
-    }
+	public List<? extends IPacket> getChildren() {
+		return delegate.getChildren();
+	}
 
-    public List<? extends IPacket> getChildren(final PacketMatcher filter) {
-	return delegate.getChildren(filter);
-    }
+	public List<? extends IPacket> getChildren(final PacketMatcher filter) {
+		return delegate.getChildren(filter);
+	}
 
+	public List<? extends IPacket> getChildren(final String name) {
+		return delegate.getChildren(name);
+	}
 
-    public int getChildrenCount() {
-	return delegate.getChildrenCount();
-    }
+	public int getChildrenCount() {
+		return delegate.getChildrenCount();
+	}
 
-    public IPacket getFirstChild(final PacketMatcher filter) {
-	return delegate.getFirstChild(filter);
-    }
+	public IPacket getFirstChild(final PacketMatcher filter) {
+		return delegate.getFirstChild(filter);
+	}
 
-    public final IPacket getFirstChild(final String childName) {
-	return delegate.getFirstChild(childName);
-    }
+	public final IPacket getFirstChild(final String childName) {
+		return delegate.getFirstChild(childName);
+	}
 
-    public final String getName() {
-	return delegate.getName();
-    }
+	public final String getName() {
+		return delegate.getName();
+	}
 
-    public final String getText() {
-	return delegate.getText();
-    }
+	public final String getText() {
+		return delegate.getText();
+	}
 
-    public boolean hasAttribute(final String name) {
-	return delegate.hasAttribute(name);
-    }
+	public boolean hasAttribute(final String name) {
+		return delegate.hasAttribute(name);
+	}
 
-    public boolean hasAttribute(final String name, final String value) {
-	return delegate.hasAttribute(name, value);
-    }
+	public boolean hasAttribute(final String name, final String value) {
+		return delegate.hasAttribute(name, value);
+	}
 
-    public boolean hasChild(final String name) {
-	return delegate.hasChild(name);
-    }
+	public boolean hasChild(final String name) {
+		return delegate.hasChild(name);
+	}
 
-    public boolean removeChild(final IPacket child) {
-	return delegate.removeChild(child);
-    }
+	public boolean removeChild(final IPacket child) {
+		return delegate.removeChild(child);
+	}
 
-    public final void setAttribute(final String name, final String value) {
-	delegate.setAttribute(name, value);
-    }
+	public final void setAttribute(final String name, final String value) {
+		delegate.setAttribute(name, value);
+	}
 
-    public final void setText(final String text) {
-	delegate.setText(text);
-    }
+	public final void setText(final String text) {
+		delegate.setText(text);
+	}
 
-    @Override
-    public String toString() {
-	return delegate.toString();
-    }
+	@Override
+	public String toString() {
+		return delegate.toString();
+	}
 
-
-    public IPacket With(final String name, final String value) {
-	delegate.With(name, value);
-	return this;
-    }
-
+	public IPacket With(final String name, final String value) {
+		delegate.With(name, value);
+		return this;
+	}
 
 }

@@ -1,6 +1,10 @@
 package com.libraryh3lp.smsgateway;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,6 +22,7 @@ import com.calclab.emite.core.client.EmiteCoreModule;
 import com.calclab.emite.core.client.bosh.BoshSettings;
 import com.calclab.emite.core.client.bosh.Connection;
 import com.calclab.emite.core.client.packet.IPacket;
+import com.calclab.emite.core.client.packet.MatcherFactory;
 import com.calclab.emite.core.client.xmpp.session.Session;
 import com.calclab.emite.core.client.xmpp.stanzas.Message;
 import com.calclab.emite.core.client.xmpp.stanzas.XmppURI;
@@ -138,68 +143,83 @@ public class BOSHConnection extends Service {
 
     /** Handle an outgoing SMS message. */
     private void handleMessage(Message message) {
-    	Log.i("gw", "handleMessage()");
     	try {
-	    	IPacket body = message.getFirstChild("sms");
-	    	String  to   = body.getAttribute("to");
-	    	String  msg  = body.getText();
+        	Chat chat = chatManager.open(XmppURI.uri("android-sms.localhost"));
+        	Message receipts = new Message(null, chat.getURI(), null);
+    		List<? extends IPacket> messages = message.getChildren("sms");
+    		for (IPacket sms : messages) {
+    			String phone = sms.getAttribute("to");
+    			String text = sms.getText();
+    	        if (phone.matches(".*\\d{9,}")) {
+    	        	try {
+	    	        	SmsManager manager = SmsManager.getDefault();
+	    	        	manager.sendMultipartTextMessage(phone, null, manager.divideMessage(text), null, null);
+    	        	} catch (Exception e) {
+    	        	}
+    	        }
+	        	IPacket receipt = receipts.addChild("receipt", null);
+	        	receipt.setAttribute("id", sms.getAttribute("id"));
+    		}
+    		if (receipts.getChildrenCount() > 0) {
+    			chat.send(receipts);
+    		}
 
-        	Log.i("gw", "outgoing message: " + to + " " + msg);
-	        if (to.matches(".*\\d{9,}")) {
-	        	Log.i("gw", "really sending now");
-	        	SmsManager manager = SmsManager.getDefault();
-	        	manager.sendMultipartTextMessage(to, null, manager.divideMessage(msg), null, null);
-	        }
+    		messages = message.getChildren("receipt");
+    		for (IPacket receipt : messages) {
+    			String id = receipt.getAttribute("id");
+        	    Queue<QMsg> unackd = new LinkedList<QMsg>();
+        	    while (! incoming.isEmpty()) {
+        	    	QMsg msg = incoming.remove();
+        	    	if (! msg.id.equals(id)) {
+        	    		unackd.add(msg);
+        	    	}
+        	    }
+        	    incoming = unackd;
+    		}
+    		if (! incoming.isEmpty()) {
+	    		handleReady();
+    		}
     	} catch (Exception e) {
     	}
     }
 
     /** Send any queued messages. */
     private void handleReady() {
-    	Log.i("gw", "handleReady()");
     	delay = 0;
     	Chat chat = chatManager.open(XmppURI.uri("android-sms.localhost"));
-
-    	while (! incoming.isEmpty()) {
-    		Log.i("gw", "running spool");
-    		Message message = new Message(null, chat.getURI(), null);
-    		IPacket body    = message.addChild("sms", null);
-
-    		QMsg msg = incoming.remove();
-    		body.setAttribute("from", msg.from);
-    		body.setAttribute("serial", ""+msg.serial);
-    		body.setText(msg.body);
-
+    	Message message = new Message(null, chat.getURI(), null);
+    	for (QMsg msg : incoming) {
+    		IPacket sms = message.addChild("sms", null);
+    		sms.setAttribute("id", msg.id);
+    		sms.setAttribute("from", msg.phone);
+    		sms.setText(msg.text);
+    	}
+    	if (message.getChildrenCount() > 0) {
     		chat.send(message);
     	}
     }
 
     private void connect() {
-    	Log.i("gw", "connect()");
     	if (connection.isConnected()) {
-    		Log.i("gw", "already connected");
     		return;
     	}
 
-    	String queue    = Settings.getQueueName(this);
+    	String queue = Settings.getQueueName(this);
     	String password = Settings.getPhoneID(this.getContentResolver());
     	if (queue == null || password == null || queue.length() == 0) {
-    		Log.i("gw", "missing credentials");
     		authFailed = true;
     		return;
     	}
     	session.login(XmppURI.uri(queue, "localhost", "android"), password);
     }
 
-    private void enqueue(String from, String body) {
+    private void enqueue(String phone, String text) {
         // Only enqueue messages from other phones, so that we can use email as a "wake-up".
-        if (from.matches(".*\\d{9,}")) {
-        	Log.i("gw", "spooling message");
-            incoming.add(new QMsg(from, body));
+        if (phone.matches(".*\\d{9,}")) {
+            incoming.add(new QMsg(phone, text));
         }
 
         if (session.isLoggedIn()) {
-        	Log.i("gw", "sending messages");
         	handleReady();
         }
         if (! connection.isConnected()) {
@@ -208,7 +228,6 @@ public class BOSHConnection extends Service {
     }
 
     private static final int[] delays = new int[]{5, 10, 15, 30, 60, 120, 300, 900};
-    private static       int   serial = 0;
 
     private final LocalBinder binder      = new LocalBinder();
     private final Connection  connection  = Suco.get(Connection.class);
@@ -220,16 +239,47 @@ public class BOSHConnection extends Service {
     private boolean               authFailed = false;
 
     private class QMsg {
-        public QMsg(String from, String body) {
-            this.serial = BOSHConnection.serial++;
-            this.from   = from;
-            this.body   = body;
+        public QMsg(String phone, String text) {
+        	this.id = BOSHConnection.messageId(phone, text);
+            this.phone = phone;
+            this.text = text;
         }
 
-        public int    serial;
-        public String from;
-        public String body;
+        public final String id;
+        public final String phone;
+        public final String text;
     };
 
     private Queue<QMsg> incoming = new LinkedList<QMsg>();
+
+    private static int serial = 0;
+    private static MessageDigest digest = null;
+
+    private static String messageId(String phone, String text) {
+        if (digest == null) {
+            try {
+                digest = MessageDigest.getInstance("SHA-1");
+            }
+            catch (NoSuchAlgorithmException nsae) {
+            }
+        }
+        try {
+        	String data = ++serial + phone + text;
+            digest.update(data.getBytes("UTF-8"));
+        }
+        catch (UnsupportedEncodingException e) {
+        }
+        return encodeHex(digest.digest());
+    }
+
+    private static String encodeHex(byte[] bytes) {
+        StringBuilder hex = new StringBuilder(bytes.length * 2);
+        for (byte aByte : bytes) {
+            if (((int) aByte & 0xff) < 0x10) {
+                hex.append("0");
+            }
+            hex.append(Integer.toString((int) aByte & 0xff, 16));
+        }
+        return hex.toString();
+    }
 }
