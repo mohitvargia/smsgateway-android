@@ -22,7 +22,6 @@ import com.calclab.emite.core.client.EmiteCoreModule;
 import com.calclab.emite.core.client.bosh.BoshSettings;
 import com.calclab.emite.core.client.bosh.Connection;
 import com.calclab.emite.core.client.packet.IPacket;
-import com.calclab.emite.core.client.packet.MatcherFactory;
 import com.calclab.emite.core.client.xmpp.session.Session;
 import com.calclab.emite.core.client.xmpp.stanzas.Message;
 import com.calclab.emite.core.client.xmpp.stanzas.XmppURI;
@@ -150,6 +149,7 @@ public class BOSHConnection extends Service {
     		for (IPacket sms : messages) {
     			String phone = sms.getAttribute("to");
     			String text = sms.getText();
+    			Log.i("gw", "got message: " + phone + " " + text);
     	        if (phone.matches(".*\\d{9,}")) {
     	        	try {
 	    	        	SmsManager manager = SmsManager.getDefault();
@@ -162,10 +162,12 @@ public class BOSHConnection extends Service {
     		}
     		if (receipts.getChildrenCount() > 0) {
     			chat.send(receipts);
+    			Log.i("gw", "sent receipts");
     		}
 
     		messages = message.getChildren("receipt");
     		for (IPacket receipt : messages) {
+    			Log.i("gw", "got receipt");
     			String id = receipt.getAttribute("id");
         	    Queue<QMsg> unackd = new LinkedList<QMsg>();
         	    while (! incoming.isEmpty()) {
@@ -196,6 +198,7 @@ public class BOSHConnection extends Service {
     	}
     	if (message.getChildrenCount() > 0) {
     		chat.send(message);
+    		Log.i("gw", "sent messages");
     	}
     }
 
