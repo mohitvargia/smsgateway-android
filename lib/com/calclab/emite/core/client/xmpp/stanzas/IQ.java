@@ -24,70 +24,70 @@ package com.calclab.emite.core.client.xmpp.stanzas;
 import com.calclab.emite.core.client.packet.IPacket;
 
 public class IQ extends BasicStanza {
-    public static enum Type {
-	error, get, result, set
-    }
-
-    private static final String NAME = "iq";
-
-    public static boolean isSet(final IPacket iq) {
-	return iq.hasAttribute(TYPE, "set");
-    }
-
-    public static boolean isSuccess(final IPacket iq) {
-	return iq.hasAttribute(TYPE, "result");
-    }
-
-    public IQ(final IPacket stanza) {
-	super(stanza);
-    }
-
-    public IQ(final Type type) {
-	super(NAME, null);
-	if (type != null) {
-	    setType(type.toString());
+	public static enum Type {
+		error, get, result, set
 	}
-    }
 
-    /**
-     * Create a new IQ
-     * 
-     * @param type
-     *            type of the IQ
-     * @param to
-     *            iq recipient
-     */
-    public IQ(final Type type, final XmppURI to) {
-	this(type);
-	super.setTo(to);
-    }
+	private static final String NAME = "iq";
 
-    public IPacket addQuery(final String xmlns) {
-	final IPacket query = addChild("query", xmlns);
-	return query;
-    }
-
-    public Type getType() {
-	try {
-	    return Type.valueOf(getAttribute(TYPE));
-	} catch (final IllegalArgumentException e) {
-	    return null;
+	public static boolean isSet(final IPacket iq) {
+		return iq.hasAttribute(TYPE, "set");
 	}
-    }
 
-    public IPacket Includes(final String name, final String xmlns) {
-	addChild(name, xmlns);
-	return this;
-    }
+	public static boolean isSuccess(final IPacket iq) {
+		return iq.hasAttribute(TYPE, "result");
+	}
 
-    public IQ To(final XmppURI toURI) {
-	setTo(toURI);
-	return this;
-    }
+	public IQ(final IPacket stanza) {
+		super(stanza);
+	}
 
-    public IQ WithQuery(final String xmlns) {
-	addQuery(xmlns);
-	return this;
-    }
+	public IQ(final Type type) {
+		super(NAME, null);
+		if (type != null) {
+			setType(type.toString());
+		}
+	}
+
+	/**
+	 * Create a new IQ
+	 * 
+	 * @param type
+	 *            type of the IQ
+	 * @param to
+	 *            iq recipient
+	 */
+	public IQ(final Type type, final XmppURI to) {
+		this(type);
+		super.setTo(to);
+	}
+
+	public IPacket addQuery(final String xmlns) {
+		final IPacket query = addChild("query", xmlns);
+		return query;
+	}
+
+	public Type getType() {
+		try {
+			return Type.valueOf(getAttribute(TYPE));
+		} catch (final IllegalArgumentException e) {
+			return null;
+		}
+	}
+
+	public IPacket Includes(final String name, final String xmlns) {
+		addChild(name, xmlns);
+		return this;
+	}
+
+	public IQ To(final XmppURI toURI) {
+		setTo(toURI);
+		return this;
+	}
+
+	public IQ WithQuery(final String xmlns) {
+		addQuery(xmlns);
+		return this;
+	}
 
 }

@@ -11,7 +11,7 @@
 Connects your phone\'s SMS to the LibraryH3lp chat system.
     </string>
     <string name="settings_label">Settings...</string> 
-    <string name="settings_title">Gateway settings</string> 
+     
     <string name="settings_shortcut">s</string> 
     <string name="status_failed_auth">failed authorization</string>
     <string name="status_failed_connect">failed to connect</string>
@@ -20,4 +20,10 @@ Connects your phone\'s SMS to the LibraryH3lp chat system.
     <string name="status_connecting">connecting</string>
     <string name="status_authorizing">authorizing</string>
     <string name="status_connected">started</string>
+<string name="password_label">Password...</string>
+
+<string name="password_shortcut">p</string>
+<string name="settings_title">Gateway Settings</string>
+<string name="password_title">Device Password</string>
+
 </resources>

@@ -16,8 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".About"
-                  android:label="@string/about_title"
+        <activity android:name=".Password"
+                  android:label="@string/password_title"
                   android:theme="@android:style/Theme.Dialog">
         </activity>
         <activity android:name=".Settings"

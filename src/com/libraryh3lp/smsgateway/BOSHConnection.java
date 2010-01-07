@@ -12,9 +12,13 @@ import java.util.TimerTask;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.telephony.TelephonyManager;
 import android.telephony.gsm.SmsManager;
 import android.util.Log;
 
@@ -23,6 +27,7 @@ import com.calclab.emite.core.client.bosh.BoshSettings;
 import com.calclab.emite.core.client.bosh.Connection;
 import com.calclab.emite.core.client.packet.IPacket;
 import com.calclab.emite.core.client.xmpp.session.Session;
+import com.calclab.emite.core.client.xmpp.stanzas.IQ;
 import com.calclab.emite.core.client.xmpp.stanzas.Message;
 import com.calclab.emite.core.client.xmpp.stanzas.XmppURI;
 import com.calclab.emite.im.client.InstantMessagingModule;
@@ -55,11 +60,20 @@ public class BOSHConnection extends Service {
         // Keep the CPU from going to sleep.  OK to turn off the screen.
         wakelock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SMSGateway");
         wakelock.acquire();
+        // And keep the network running!
+        wifilock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "libraryh3lp");
+        wifilock.acquire();
     }
 
     @Override
     public void onDestroy() {
     	connection.disconnect();
+    	if (wifilock != null && wifilock.isHeld()) {
+    		wifilock.release();
+    	}
+    	if (wakelock != null && wakelock.isHeld()) {
+    		wakelock.release();
+    	}
     }
 
     @Override
@@ -96,6 +110,12 @@ public class BOSHConnection extends Service {
                 }
             }
         });
+        
+        session.onIQ(new Listener<IQ>() {
+        	public void onEvent(IQ iq) {
+        		handleIQ(iq);
+        	}
+        });
 
         chatManager.onChatCreated(new Listener<Chat>() {
             public void onEvent(Chat chat) {
@@ -103,7 +123,7 @@ public class BOSHConnection extends Service {
             }
         });
 
-        connection.setSettings(new BoshSettings("http://10.0.2.2/http-bind/", "localhost", "1.6", 300, 1, 2));
+        connection.setSettings(new BoshSettings("http://libraryh3lp.com/http-bind/", "libraryh3lp.com", "1.6", 300, 1, 2));
         connection.onError(new Listener<String> () {
             public void onEvent(String msg) {
             	handleError();
@@ -143,7 +163,7 @@ public class BOSHConnection extends Service {
     /** Handle an outgoing SMS message. */
     private void handleMessage(Message message) {
     	try {
-        	Chat chat = chatManager.open(XmppURI.uri("android-sms.localhost"));
+        	Chat chat = chatManager.open(XmppURI.uri("android-sms.libraryh3lp.com"));
         	Message receipts = new Message(null, chat.getURI(), null);
     		List<? extends IPacket> messages = message.getChildren("sms");
     		for (IPacket sms : messages) {
@@ -188,7 +208,7 @@ public class BOSHConnection extends Service {
     /** Send any queued messages. */
     private void handleReady() {
     	delay = 0;
-    	Chat chat = chatManager.open(XmppURI.uri("android-sms.localhost"));
+    	Chat chat = chatManager.open(XmppURI.uri("android-sms.libraryh3lp.com"));
     	Message message = new Message(null, chat.getURI(), null);
     	for (QMsg msg : incoming) {
     		IPacket sms = message.addChild("sms", null);
@@ -213,7 +233,7 @@ public class BOSHConnection extends Service {
     		authFailed = true;
     		return;
     	}
-    	session.login(XmppURI.uri(queue, "localhost", "android"), password);
+    	session.login(XmppURI.uri(queue, "libraryh3lp.com", "android"), password);
     }
 
     private void enqueue(String phone, String text) {
@@ -238,8 +258,9 @@ public class BOSHConnection extends Service {
     private final ChatManager chatManager = Suco.get(ChatManager.class);
 
     private PowerManager.WakeLock wakelock;
-    private int                   delay      = 0;
-    private boolean               authFailed = false;
+    private WifiManager.WifiLock wifilock;
+    private int delay = 0;
+    private boolean authFailed = false;
 
     private class QMsg {
         public QMsg(String phone, String text) {
@@ -284,5 +305,64 @@ public class BOSHConnection extends Service {
             hex.append(Integer.toString((int) aByte & 0xff, 16));
         }
         return hex.toString();
+    }
+
+    private void handleIQ(IQ iq) {
+    	if (iq.getType() != IQ.Type.get) {
+    		return;
+    	}
+
+    	IPacket query = iq.getFirstChild("query");
+    	String xmlns = query.getAttribute("xmlns");
+
+    	String result = null;
+    	if (xmlns.equals("libraryh3lp:iq:line1-number")) {
+    		result = getIQLine1Number();
+    	}
+    	if (xmlns.equals("libraryh3lp:iq:network-operator")) {
+    		result = getIQNetworkOperator();
+    	}
+    	if (xmlns.equals("libraryh3lp:iq:network-type")) {
+    		result = getIQNetworkType();
+    	}
+    	if (xmlns.equals("libraryh3lp:iq:software-version")) {
+    		result = getIQSoftwareVersion();
+    	}
+    	if (xmlns.equals("libraryh3lp:iq:version")) {
+    		result = getIQVersion();
+    	}
+
+    	if (result != null) {
+    		IQ reply = new IQ(IQ.Type.result);
+    		reply.setAttribute("id", iq.getAttribute("id"));
+    		reply.setAttribute("to", iq.getAttribute("from"));
+    		reply.addQuery(xmlns).setText(result);
+    		session.send(reply);
+    	}
+    }
+
+    private String getIQLine1Number() {
+    	TelephonyManager mgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+    	return mgr.getLine1Number();
+    }
+
+    private String getIQNetworkOperator() {
+    	TelephonyManager mgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+    	return mgr.getNetworkOperator() + "/" + mgr.getNetworkOperatorName();
+    }
+
+    private String getIQNetworkType() {
+    	ConnectivityManager mgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    	NetworkInfo info = mgr.getActiveNetworkInfo();
+    	return info.getTypeName() + "/" + info.getSubtypeName() + "/" + info.getExtraInfo();
+    }
+
+    private String getIQSoftwareVersion() {
+    	TelephonyManager mgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+    	return mgr.getDeviceSoftwareVersion();
+    }
+
+    private String getIQVersion() {
+    	return "1.0.0";
     }
 }

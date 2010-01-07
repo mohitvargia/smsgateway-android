@@ -19,7 +19,6 @@ public class SMSGateway extends Activity implements OnClickListener, ServiceConn
 
         findViewById(R.id.start_button).setOnClickListener(this);
         findViewById(R.id.stop_button).setOnClickListener(this);
-        findViewById(R.id.about_button).setOnClickListener(this);
         
         status = (StatusTextView) findViewById(R.id.status);
     }
@@ -38,9 +37,6 @@ public class SMSGateway extends Activity implements OnClickListener, ServiceConn
             	status.update(Status.DISCONNECTED);
             }
             break;
-        case R.id.about_button:
-            startActivity(new Intent(this, About.class));
-            break;
         }
     }
 
@@ -57,7 +53,9 @@ public class SMSGateway extends Activity implements OnClickListener, ServiceConn
         case R.id.settings: 
             startActivity(new Intent(this, Settings.class)); 
             return true; 
-        } 
+        case R.id.password:
+        	startActivity(new Intent(this, Password.class));
+        }
         return false; 
     }
 

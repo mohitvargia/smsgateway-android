@@ -23,6 +23,8 @@ package com.calclab.emite.core.client.bosh;
 
 import java.util.List;
 
+import android.util.Log;
+
 import com.calclab.emite.core.client.packet.IPacket;
 import com.calclab.emite.core.client.packet.Packet;
 import com.calclab.emite.core.client.services.ConnectorCallback;
@@ -32,7 +34,6 @@ import com.calclab.emite.core.client.services.Services;
 import com.calclab.suco.client.events.Event;
 import com.calclab.suco.client.events.Event0;
 import com.calclab.suco.client.events.Listener;
-import com.calclab.suco.client.log.Logger;
 
 public class BoshConnection implements Connection {
 	private int activeConnections;
@@ -65,13 +66,13 @@ public class BoshConnection implements Connection {
 
 			public void onError(final String request, final Throwable throwable) {
 				if (running) {
-					Logger.debug("Connection error (total: {0}): {1}", errors, throwable);
+					Log.d("gw", "Connection error (total: {0}): {1}", throwable);
 					errors++;
 					if (errors > 2) {
 						running = false;
 						onError.fire("Connection error: " + throwable.toString());
 					} else {
-						Logger.debug("Error retry: " + throwable);
+						Log.d("gw", "Error retry: " + throwable);
 						send(request);
 					}
 				}

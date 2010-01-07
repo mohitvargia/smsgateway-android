@@ -19,7 +19,7 @@ public class Settings extends PreferenceActivity {
     }
     
     public static String getPhoneID(ContentResolver resolver) {
-    	return "test"; // Secure.getString(resolver, Secure.ANDROID_ID);
+    	return Secure.getString(resolver, Secure.ANDROID_ID);
     }
 
     public static boolean getStartup(Context context) {

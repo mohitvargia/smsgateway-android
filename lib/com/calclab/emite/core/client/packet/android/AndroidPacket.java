@@ -38,130 +38,133 @@ import com.calclab.emite.core.client.packet.PacketRenderer;
 import com.calclab.emite.core.client.packet.TextUtils;
 
 public class AndroidPacket extends AbstractPacket {
-    private static final List<IPacket> EMPTY_LIST = new ArrayList<IPacket>();
-    private final Element element;
+	private static final List<IPacket> EMPTY_LIST = new ArrayList<IPacket>();
+	private final Element element;
 
-    public AndroidPacket(final Element element) {
-	this.element = element;
-    }
-
-    public IPacket addChild(final String nodeName, final String xmlns) {
-	final Element child = element.getOwnerDocument().createElement(nodeName);
-	element.appendChild(child);
-	return new AndroidPacket(child);
-    }
-
-    public String getAttribute(final String name) {
-	return element.getAttribute(name);
-    }
-
-    public HashMap<String, String> getAttributes() {
-	final HashMap<String, String> map = new HashMap<String, String>();
-	final NamedNodeMap attributes = element.getAttributes();
-	for (int index = 0; index < attributes.getLength(); index++) {
-	    final Node attrib = attributes.item(index);
-	    map.put(attrib.getNodeName(), attrib.getNodeValue());
+	public AndroidPacket(final Element element) {
+		this.element = element;
 	}
-	return map;
-    }
 
-    public Map<String, String> getAttributtes() {
-	final HashMap<String, String> attributes = new HashMap<String, String>();
-	final NamedNodeMap original = element.getAttributes();
-	for (int index = 0; index < original.getLength(); index++) {
-	    final Node node = original.item(index);
-	    attributes.put(node.getNodeName(), node.getNodeValue());
+	public IPacket addChild(final String nodeName, final String xmlns) {
+		final Element child = element.getOwnerDocument()
+				.createElement(nodeName);
+		element.appendChild(child);
+		return new AndroidPacket(child);
 	}
-	return attributes;
-    }
 
-    public List<? extends IPacket> getChildren() {
-	return wrap(element.getChildNodes());
-    }
-
-    @Override
-        public List<IPacket> getChildren(final String name) {
-	final NodeList nodes = element.getElementsByTagName(name);
-	return wrap(nodes);
-    }
-
-    public int getChildrenCount() {
-	return element.getChildNodes().getLength();
-    }
-
-    public Element getElement() {
-	return element;
-    }
-
-    @Override
-        public IPacket getFirstChild(final String childName) {
-	final NodeList nodes = element.getElementsByTagName(childName);
-	return nodes.getLength() > 0 ? new AndroidPacket((Element) nodes.item(0)) : NoPacket.INSTANCE;
-    }
-
-    public String getName() {
-	return element.getNodeName();
-    }
-
-    public IPacket getParent() {
-	return new AndroidPacket((Element) element.getParentNode());
-    }
-
-    public String getText() {
-	Node item;
-	final NodeList childs = element.getChildNodes();
-	for (int index = 0; index < childs.getLength(); index++) {
-	    item = childs.item(index);
-	    if (item.getNodeType() == Node.TEXT_NODE) {
-		return TextUtils.unescape(item.getNodeValue());
-	    }
+	public String getAttribute(final String name) {
+		return element.getAttribute(name);
 	}
-	return null;
-    }
 
-    public boolean removeChild(final IPacket child) {
-	final Element childElement = ((AndroidPacket) child).element;
-	return element.removeChild(childElement) != null;
-    }
-
-    public void setAttribute(final String name, final String value) {
-	if (value != null) {
-	    element.setAttribute(name, value);
-	} else {
-	    element.removeAttribute(name);
+	public HashMap<String, String> getAttributes() {
+		final HashMap<String, String> map = new HashMap<String, String>();
+		final NamedNodeMap attributes = element.getAttributes();
+		for (int index = 0; index < attributes.getLength(); index++) {
+			final Node attrib = attributes.item(index);
+			map.put(attrib.getNodeName(), attrib.getNodeValue());
+		}
+		return map;
 	}
-    }
 
-    public void setText(final String text) {
-	final String escaped = TextUtils.escape(text);
-	final NodeList nodes = element.getChildNodes();
-	for (int index = 0; index < nodes.getLength(); index++) {
-	    final Node child = nodes.item(index);
-	    if (child.getNodeType() == Node.TEXT_NODE) {
-		element.removeChild(child);
-	    }
+	public Map<String, String> getAttributtes() {
+		final HashMap<String, String> attributes = new HashMap<String, String>();
+		final NamedNodeMap original = element.getAttributes();
+		for (int index = 0; index < original.getLength(); index++) {
+			final Node node = original.item(index);
+			attributes.put(node.getNodeName(), node.getNodeValue());
+		}
+		return attributes;
 	}
-	element.appendChild(element.getOwnerDocument().createTextNode(escaped));
-    }
 
-    @Override
-    public String toString() {
-	return PacketRenderer.toString(this);
-    }
+	public List<? extends IPacket> getChildren() {
+		return wrap(element.getChildNodes());
+	}
 
-    private List<IPacket> wrap(final NodeList nodes) {
-	int length;
-	if (nodes == null || (length = nodes.getLength()) == 0) {
-	    return EMPTY_LIST;
+	@Override
+	public List<IPacket> getChildren(final String name) {
+		final NodeList nodes = element.getElementsByTagName(name);
+		return wrap(nodes);
 	}
-	final ArrayList<IPacket> selected = new ArrayList<IPacket>();
-	for (int index = 0; index < length; index++) {
-	    final Node node = nodes.item(index);
-	    if (node.getNodeType() == Node.ELEMENT_NODE) {
-		selected.add(new AndroidPacket((Element) node));
-	    } else if (node.getNodeType() == Node.TEXT_NODE) {
-	    }
+
+	public int getChildrenCount() {
+		return element.getChildNodes().getLength();
 	}
-	return selected;
-    }
+
+	public Element getElement() {
+		return element;
+	}
+
+	@Override
+	public IPacket getFirstChild(final String childName) {
+		final NodeList nodes = element.getElementsByTagName(childName);
+		return nodes.getLength() > 0 ? new AndroidPacket((Element) nodes
+				.item(0)) : NoPacket.INSTANCE;
+	}
+
+	public String getName() {
+		return element.getNodeName();
+	}
+
+	public IPacket getParent() {
+		return new AndroidPacket((Element) element.getParentNode());
+	}
+
+	public String getText() {
+		StringBuilder builder = new StringBuilder();
+		Node item;
+		final NodeList childs = element.getChildNodes();
+		for (int index = 0; index < childs.getLength(); index++) {
+			item = childs.item(index);
+			if (item.getNodeType() == Node.TEXT_NODE) {
+				builder.append(TextUtils.unescape(item.getNodeValue()));
+			}
+		}
+		return builder.toString();
+	}
+
+	public boolean removeChild(final IPacket child) {
+		final Element childElement = ((AndroidPacket) child).element;
+		return element.removeChild(childElement) != null;
+	}
+
+	public void setAttribute(final String name, final String value) {
+		if (value != null) {
+			element.setAttribute(name, value);
+		} else {
+			element.removeAttribute(name);
+		}
+	}
+
+	public void setText(final String text) {
+		final String escaped = TextUtils.escape(text);
+		final NodeList nodes = element.getChildNodes();
+		for (int index = 0; index < nodes.getLength(); index++) {
+			final Node child = nodes.item(index);
+			if (child.getNodeType() == Node.TEXT_NODE) {
+				element.removeChild(child);
+			}
+		}
+		element.appendChild(element.getOwnerDocument().createTextNode(escaped));
+	}
+
+	@Override
+	public String toString() {
+		return PacketRenderer.toString(this);
+	}
+
+	private List<IPacket> wrap(final NodeList nodes) {
+		int length;
+		if (nodes == null || (length = nodes.getLength()) == 0) {
+			return EMPTY_LIST;
+		}
+		final ArrayList<IPacket> selected = new ArrayList<IPacket>();
+		for (int index = 0; index < length; index++) {
+			final Node node = nodes.item(index);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				selected.add(new AndroidPacket((Element) node));
+			} else if (node.getNodeType() == Node.TEXT_NODE) {
+			}
+		}
+		return selected;
+	}
 }
