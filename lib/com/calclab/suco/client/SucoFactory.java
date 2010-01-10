@@ -30,18 +30,17 @@ import com.calclab.suco.client.log.Logger;
  * Suco instead)
  */
 public class SucoFactory {
-    /**
-     * Create a new container. Usually you use don't need to call this method:
-     * use the Suco.components container instead.
-     * 
-     * @param modules
-     * @return
-     */
-    public static Container create() {
-	Logger.debug("New container.");
-	final HashMapContainer container = new HashMapContainer();
-	new SucoCoreModule().onInstall(container);
-	return container;
-    }
-
+	/**
+	 * Create a new container. Usually you use don't need to call this method:
+	 * use the Suco.components container instead.
+	 * 
+	 * @param modules
+	 * @return
+	 */
+	public static Container create() {
+		Logger.debug("New container.");
+		final HashMapContainer container = new HashMapContainer();
+		new SucoCoreModule().onInstall(container);
+		return container;
+	}
 }

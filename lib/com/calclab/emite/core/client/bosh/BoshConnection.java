@@ -191,7 +191,7 @@ public class BoshConnection implements Connection {
 				final int msecs = 6000;
 				services.schedule(msecs, new ScheduledAction() {
 					public void run() {
-						if (body == null && stream.rid == currentRID) {
+						if (body == null && stream != null && stream.rid == currentRID) {
 							createBody();
 							sendBody();
 						}

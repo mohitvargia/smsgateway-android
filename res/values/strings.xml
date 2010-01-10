@@ -4,26 +4,25 @@
     <string name="app_name">LibraryH3lp SMS Gateway</string>
     <string name="start_label">Start</string>
     <string name="stop_label">Stop</string>
-    <string name="about_label">About</string>
-    <string name="exit_label">Exit</string>
-    <string name="about_title">About SMS Gateway</string>
-    <string name="about_text">\
-Connects your phone\'s SMS to the LibraryH3lp chat system.
-    </string>
+    
+    
+    
+    
     <string name="settings_label">Settings...</string> 
      
     <string name="settings_shortcut">s</string> 
-    <string name="status_failed_auth">failed authorization</string>
-    <string name="status_failed_connect">failed to connect</string>
-    <string name="status_not_running">not running</string>
-    <string name="status_disconnected">stopped</string>
+    <string name="status_failed_auth">authorization failed</string>
+    <string name="status_failed_connect">connection error</string>
+    <string name="status_not_running">not started</string>
+    <string name="status_disconnected">disconnected</string>
     <string name="status_connecting">connecting</string>
     <string name="status_authorizing">authorizing</string>
-    <string name="status_connected">started</string>
+    <string name="status_connected">running</string>
 <string name="password_label">Password...</string>
 
 <string name="password_shortcut">p</string>
 <string name="settings_title">Gateway Settings</string>
 <string name="password_title">Device Password</string>
 
+<string name="status_retrying">retrying</string>
 </resources>

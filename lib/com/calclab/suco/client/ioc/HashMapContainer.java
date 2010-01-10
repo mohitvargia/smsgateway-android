@@ -30,45 +30,48 @@ import com.calclab.suco.client.log.Logger;
  * A basic implementation of container
  */
 @SuppressWarnings("serial")
-public class HashMapContainer extends HashMap<Class<?>, Provider<?>> implements Container {
+public class HashMapContainer extends HashMap<Class<?>, Provider<?>> implements
+		Container {
 
-    public HashMapContainer() {
-    }
-
-    public <T> T getInstance(final Class<T> componentKey) {
-	return getProvider(componentKey).get();
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> Provider<T> getProvider(final Class<T> componentKey) {
-	final Provider<T> provider = (Provider<T>) get(componentKey);
-	if (provider == null) {
-	    final String message = Logger.format(
-		    "getProvider failed: component of type {0} not registered. Registered component keys: [{1}]",
-		    componentKey, Logger.toString(keySet()));
-	    throw new RuntimeException(message);
+	public HashMapContainer() {
 	}
-	return provider;
-    }
 
-    public boolean hasProvider(final Class<?> componentKey) {
-	return containsKey(componentKey);
-    }
-
-    public <T> Provider<T> registerProvider(final Decorator decorator, final Class<T> componentType,
-	    final Provider<T> provider) {
-	if (containsKey(componentType)) {
-	    throw new RuntimeException(Logger.format("Provider of type {0} already registered.", componentType));
+	public <T> T getInstance(final Class<T> componentKey) {
+		return getProvider(componentKey).get();
 	}
-	Logger.debug("Registering provider of type: {0}", componentType);
-	final Provider<T> decoratedProvider = decorator == null ? provider : decorator
-		.decorate(componentType, provider);
-	put(componentType, decoratedProvider);
-	return decoratedProvider;
-    }
 
-    @SuppressWarnings("unchecked")
-    public <T> Provider<T> removeProvider(final Class<T> componentKey) {
-	return (Provider<T>) remove(componentKey);
-    }
+	@SuppressWarnings("unchecked")
+	public <T> Provider<T> getProvider(final Class<T> componentKey) {
+		final Provider<T> provider = (Provider<T>) get(componentKey);
+		if (provider == null) {
+			final String message = Logger
+					.format(
+							"getProvider failed: component of type {0} not registered. Registered component keys: [{1}]",
+							componentKey, Logger.toString(keySet()));
+			throw new RuntimeException(message);
+		}
+		return provider;
+	}
+
+	public boolean hasProvider(final Class<?> componentKey) {
+		return containsKey(componentKey);
+	}
+
+	public <T> Provider<T> registerProvider(final Decorator decorator,
+			final Class<T> componentType, final Provider<T> provider) {
+		if (containsKey(componentType)) {
+			throw new RuntimeException(Logger.format(
+					"Provider of type {0} already registered.", componentType));
+		}
+		Logger.debug("Registering provider of type: {0}", componentType);
+		final Provider<T> decoratedProvider = decorator == null ? provider
+				: decorator.decorate(componentType, provider);
+		put(componentType, decoratedProvider);
+		return decoratedProvider;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> Provider<T> removeProvider(final Class<T> componentKey) {
+		return (Provider<T>) remove(componentKey);
+	}
 }

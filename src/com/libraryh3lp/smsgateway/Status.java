@@ -11,6 +11,7 @@ public interface Status {
     public static final int CONNECTING     =  2;
     public static final int AUTHORIZING    =  3;
     public static final int CONNECTED      =  4;
+    public static final int RETRYING       =  5;
 
     public void update(int flag);
     public boolean isCritical(int flag);

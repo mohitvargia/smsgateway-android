@@ -33,6 +33,7 @@ public class StatusTextView extends TextView implements Status {
         texts.put(CONNECTING,     (String) context.getText(R.string.status_connecting));
         texts.put(AUTHORIZING,    (String) context.getText(R.string.status_authorizing));
         texts.put(CONNECTED,      (String) context.getText(R.string.status_connected));
+        texts.put(RETRYING,       (String) context.getText(R.string.status_retrying));
 
         // Build a color HashMap lookup table.
         // Note: RED is left as an exercise using the isCritical method.
@@ -40,6 +41,7 @@ public class StatusTextView extends TextView implements Status {
         colors.put(CONNECTING,    Color.YELLOW);
         colors.put(AUTHORIZING,   Color.YELLOW);
         colors.put(CONNECTED,     Color.GREEN);
+        colors.put(RETRYING,      Color.YELLOW);
     }
 
     public boolean isCritical(int flag) {

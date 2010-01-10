@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
@@ -38,8 +39,10 @@ import com.calclab.suco.client.events.Listener;
 
 public class BOSHConnection extends Service {
     {
-    	Suco.install(new EmiteCoreModule());
-    	Suco.install(new InstantMessagingModule());
+    	if (! Suco.getComponents().hasProvider(Connection.class)) {
+	    	Suco.install(new EmiteCoreModule());
+	    	Suco.install(new InstantMessagingModule());
+    	}
     }
 
     /** Public interface. */
@@ -48,15 +51,22 @@ public class BOSHConnection extends Service {
         public void enqueue(String from, String body) {
         	BOSHConnection.this.enqueue(from, body);
         }
+
+        public int getStatus() {
+        	return BOSHConnection.this.getStatus();
+        }
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+    	Log.i("gw", "onBind()");
         return binder;
     }
 
     @Override
     public void onCreate() {
+    	Log.i("gw", "onCreate()");
+    	super.onCreate();
         // Keep the CPU from going to sleep.  OK to turn off the screen.
         wakelock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SMSGateway");
         wakelock.acquire();
@@ -67,7 +77,14 @@ public class BOSHConnection extends Service {
 
     @Override
     public void onDestroy() {
-    	connection.disconnect();
+    	Log.i("gw", "onDestroy()");
+    	super.onDestroy();
+    	if (session.isLoggedIn()) {
+    		session.logout();
+    	}
+    	if (connection.isConnected()) {
+    		connection.disconnect();
+    	}
     	if (wifilock != null && wifilock.isHeld()) {
     		wifilock.release();
     	}
@@ -76,15 +93,51 @@ public class BOSHConnection extends Service {
     	}
     }
 
+    private boolean started = false;
+
     @Override
     public void onStart(Intent intent, int startId) {
+    	Log.i("gw", "onStart()");
         super.onStart(intent, startId);
+        started = true;
         connect();
     }
 
     public BOSHConnection() {
     	Log.i("gw", "BoshConnection()");
     	initConnection();
+    }
+
+    private int getStatus() {
+    	if (! started) {
+    		return Status.NOT_RUNNING;
+    	}
+    	if (authFailed) {
+    		return Status.FAILED_AUTH;
+    	}
+
+    	switch (session.getState()) {
+    	case error:
+    		return Status.FAILED_CONNECT;
+    	case notAuthorized:
+    		return Status.FAILED_AUTH;
+    	case connecting:
+    		return Status.CONNECTING;
+    	case authorized:
+    		return Status.CONNECTING;
+    	case loggedIn:
+    		return Status.AUTHORIZING;
+    	case ready:
+    		return Status.CONNECTED;
+    	}
+
+    	return delay > 0 ? Status.RETRYING : Status.DISCONNECTED;
+    }
+
+    private void updateStatus() {
+    	Uri uri = Uri.fromParts("libraryh3lp", ""+getStatus(), null);
+    	Intent update = new Intent(Intent.ACTION_VIEW, uri);
+    	sendBroadcast(update);
     }
 
     private void initConnection() {
@@ -108,9 +161,10 @@ public class BOSHConnection extends Service {
                 	Log.i("gw", "disconnected");
                 	break;
                 }
+                updateStatus();
             }
         });
-        
+
         session.onIQ(new Listener<IQ>() {
         	public void onEvent(IQ iq) {
         		handleIQ(iq);
@@ -127,6 +181,7 @@ public class BOSHConnection extends Service {
         connection.onError(new Listener<String> () {
             public void onEvent(String msg) {
             	handleError();
+            	updateStatus();
             }
         });
     }
@@ -233,6 +288,7 @@ public class BOSHConnection extends Service {
     		authFailed = true;
     		return;
     	}
+
     	session.login(XmppURI.uri(queue, "libraryh3lp.com", "android"), password);
     }
 
@@ -252,10 +308,10 @@ public class BOSHConnection extends Service {
 
     private static final int[] delays = new int[]{5, 10, 15, 30, 60, 120, 300, 900};
 
-    private final LocalBinder binder      = new LocalBinder();
-    private final Connection  connection  = Suco.get(Connection.class);
-    private final Session     session     = Suco.get(Session.class);
-    private final ChatManager chatManager = Suco.get(ChatManager.class);
+    private LocalBinder binder      = new LocalBinder();
+    private Connection  connection  = Suco.get(Connection.class);
+    private Session     session     = Suco.get(Session.class);
+    private ChatManager chatManager = Suco.get(ChatManager.class);
 
     private PowerManager.WakeLock wakelock;
     private WifiManager.WifiLock wifilock;

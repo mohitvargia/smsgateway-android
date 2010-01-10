@@ -31,24 +31,24 @@ import com.calclab.suco.client.ioc.module.SucoModule;
  * Install the basic Suco infrastructure
  */
 public class SucoCoreModule implements SucoModule {
-
-    public void onInstall(final Container container) {
-	container.registerProvider(null, Container.class, new Provider<Container>() {
-	    public Container get() {
-		return container;
-	    }
-	});
-	container.registerProvider(null, NoDecoration.class, new Provider<NoDecoration>() {
-	    public NoDecoration get() {
-		return NoDecoration.instance;
-	    }
-	});
-	container.registerProvider(null, Singleton.class, new Provider<Singleton>() {
-
-	    public Singleton get() {
-		return Singleton.instance;
-	    }
-	});
-    }
-
+	public void onInstall(final Container container) {
+		container.registerProvider(null, Container.class,
+				new Provider<Container>() {
+					public Container get() {
+						return container;
+					}
+				});
+		container.registerProvider(null, NoDecoration.class,
+				new Provider<NoDecoration>() {
+					public NoDecoration get() {
+						return NoDecoration.instance;
+					}
+				});
+		container.registerProvider(null, Singleton.class,
+				new Provider<Singleton>() {
+					public Singleton get() {
+						return Singleton.instance;
+					}
+				});
+	}
 }

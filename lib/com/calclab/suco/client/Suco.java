@@ -30,39 +30,38 @@ import com.calclab.suco.client.ioc.module.SucoModule;
  */
 public class Suco {
 
-    private static final Container components = SucoFactory.create();
+	private static final Container components = SucoFactory.create();
 
-    /**
-     * Obtain a instance from the Suco container
-     * 
-     * @param <T>
-     * @param componentType
-     * @return
-     */
-    public static <T> T get(final Class<T> componentType) {
-	return components.getInstance(componentType);
-    }
-
-    /**
-     * Get the Suco container itself.
-     * 
-     * @return the Suco singleton container
-     */
-    public static Container getComponents() {
-	return components;
-    }
-
-    /**
-     * Install the given modules into the container
-     * 
-     * @param modules
-     *            the list of modules to be installed in the singleton Suco
-     *            container
-     */
-    public static void install(final SucoModule... modules) {
-	for (final SucoModule sucoModule : modules) {
-	    sucoModule.onInstall(components);
+	/**
+	 * Obtain a instance from the Suco container
+	 * 
+	 * @param <T>
+	 * @param componentType
+	 * @return
+	 */
+	public static <T> T get(final Class<T> componentType) {
+		return components.getInstance(componentType);
 	}
-    }
 
+	/**
+	 * Get the Suco container itself.
+	 * 
+	 * @return the Suco singleton container
+	 */
+	public static Container getComponents() {
+		return components;
+	}
+
+	/**
+	 * Install the given modules into the container
+	 * 
+	 * @param modules
+	 *            the list of modules to be installed in the singleton Suco
+	 *            container
+	 */
+	public static void install(final SucoModule... modules) {
+		for (final SucoModule sucoModule : modules) {
+			sucoModule.onInstall(components);
+		}
+	}
 }

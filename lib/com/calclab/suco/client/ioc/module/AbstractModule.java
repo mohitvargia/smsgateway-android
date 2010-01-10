@@ -28,42 +28,43 @@ import com.calclab.suco.client.ioc.Provider;
  * The default class to extend to create a Module. Implements all the facilities
  * of the ModuleBuilder with a couple of helper methods
  */
-public abstract class AbstractModule extends ModuleBuilderImpl implements SucoModule {
+public abstract class AbstractModule extends ModuleBuilderImpl implements
+		SucoModule {
 
-    public AbstractModule() {
-    }
+	public AbstractModule() {
+	}
 
-    public void onInstall(final Container container) {
-	this.container = container;
-	onInstall();
-    }
+	public void onInstall(final Container container) {
+		this.container = container;
+		onInstall();
+	}
 
-    /**
-     * Get a instance of the specified component key
-     * 
-     * @param <T>
-     *            The component key
-     * @param componentType
-     *            The component key
-     * @return The component instance
-     */
-    protected <T> T $(final Class<T> componentType) {
-	return container.getInstance(componentType);
-    }
+	/**
+	 * Get a instance of the specified component key
+	 * 
+	 * @param <T>
+	 *            The component key
+	 * @param componentType
+	 *            The component key
+	 * @return The component instance
+	 */
+	protected <T> T $(final Class<T> componentType) {
+		return container.getInstance(componentType);
+	}
 
-    /**
-     * Get a provider of the specified component key
-     * 
-     * @param <T>
-     *            The component key
-     * @param componentType
-     *            The component key
-     * @return The provider of that component key
-     */
-    protected <T> Provider<T> $$(final Class<T> componentType) {
-	return container.getProvider(componentType);
-    }
+	/**
+	 * Get a provider of the specified component key
+	 * 
+	 * @param <T>
+	 *            The component key
+	 * @param componentType
+	 *            The component key
+	 * @return The provider of that component key
+	 */
+	protected <T> Provider<T> $$(final Class<T> componentType) {
+		return container.getProvider(componentType);
+	}
 
-    protected abstract void onInstall();
+	protected abstract void onInstall();
 
 }
