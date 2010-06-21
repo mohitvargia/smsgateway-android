@@ -3,6 +3,7 @@ package com.libraryh3lp.smsgateway;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -222,18 +223,24 @@ public class BOSHConnection extends Service {
         	Message receipts = new Message(null, chat.getURI(), null);
     		List<? extends IPacket> messages = message.getChildren("sms");
     		for (IPacket sms : messages) {
+    			String id = sms.getAttribute("id");
     			String phone = sms.getAttribute("to");
     			String text = sms.getText();
     			Log.i("gw", "got message: " + phone + " " + text);
-    	        if (phone.matches(".*\\d{9,}")) {
+    	        if (phone.matches(".*\\d{9,}") && ! outgoing.contains(id)) {
     	        	try {
 	    	        	SmsManager manager = SmsManager.getDefault();
 	    	        	manager.sendMultipartTextMessage(phone, null, manager.divideMessage(text), null, null);
     	        	} catch (Exception e) {
     	        	}
+    	        	outgoing.add(id);
     	        }
 	        	IPacket receipt = receipts.addChild("receipt", null);
-	        	receipt.setAttribute("id", sms.getAttribute("id"));
+	        	receipt.setAttribute("id", id);
+	        	
+	        	while (outgoing.size() > 10) {
+	        		outgoing.remove(0);
+	        	}
     		}
     		if (receipts.getChildrenCount() > 0) {
     			chat.send(receipts);
@@ -331,6 +338,7 @@ public class BOSHConnection extends Service {
     };
 
     private Queue<QMsg> incoming = new LinkedList<QMsg>();
+    private ArrayList<String> outgoing = new ArrayList<String>();
 
     private static int serial = 0;
     private static MessageDigest digest = null;
@@ -419,6 +427,6 @@ public class BOSHConnection extends Service {
     }
 
     private String getIQVersion() {
-    	return "1.0.0";
+    	return "1.0.1";
     }
 }
