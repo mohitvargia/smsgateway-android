@@ -25,4 +25,14 @@
 <string name="password_title">Device Password</string>
 
 <string name="status_retrying">retrying</string>
+<string-array name="server_names">
+    <item>mycustomercloud.com</item>
+    <item>libraryh3lp.com</item>
+    <item>refchatter.net</item>
+</string-array>
+<string-array name="server_labels">
+    <item>My Customer Cloud</item>
+    <item>LibraryH3lp</item>
+    <item>RefChatter</item>
+</string-array>
 </resources>

@@ -1,4 +1,4 @@
-package com.libraryh3lp.smsgateway;
+package com.nubgames.smsgateway;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -29,6 +29,7 @@ import com.calclab.emite.core.client.bosh.BoshSettings;
 import com.calclab.emite.core.client.bosh.Connection;
 import com.calclab.emite.core.client.packet.IPacket;
 import com.calclab.emite.core.client.xmpp.session.Session;
+import com.calclab.emite.core.client.xmpp.session.Session.State;
 import com.calclab.emite.core.client.xmpp.stanzas.IQ;
 import com.calclab.emite.core.client.xmpp.stanzas.Message;
 import com.calclab.emite.core.client.xmpp.stanzas.XmppURI;
@@ -178,7 +179,7 @@ public class BOSHConnection extends Service {
             }
         });
 
-        connection.setSettings(new BoshSettings("http://libraryh3lp.com/http-bind/", "libraryh3lp.com", "1.6", 300, 1, 2));
+        connection.setSettings(new BoshSettings("http://"+Settings.getServer(this)+"/http-bind/", Settings.getServer(this), "1.6", 300, 1, 2));
         connection.onError(new Listener<String> () {
             public void onEvent(String msg) {
             	handleError();
@@ -219,7 +220,7 @@ public class BOSHConnection extends Service {
     /** Handle an outgoing SMS message. */
     private void handleMessage(Message message) {
     	try {
-        	Chat chat = chatManager.open(XmppURI.uri("android-sms.libraryh3lp.com"));
+        	Chat chat = chatManager.open(XmppURI.uri("android-sms."+Settings.getServer(this)));
         	Message receipts = new Message(null, chat.getURI(), null);
     		List<? extends IPacket> messages = message.getChildren("sms");
     		for (IPacket sms : messages) {
@@ -270,7 +271,7 @@ public class BOSHConnection extends Service {
     /** Send any queued messages. */
     private void handleReady() {
     	delay = 0;
-    	Chat chat = chatManager.open(XmppURI.uri("android-sms.libraryh3lp.com"));
+    	Chat chat = chatManager.open(XmppURI.uri("android-sms."+Settings.getServer(this)));
     	Message message = new Message(null, chat.getURI(), null);
     	for (QMsg msg : incoming) {
     		IPacket sms = message.addChild("sms", null);
@@ -296,7 +297,7 @@ public class BOSHConnection extends Service {
     		return;
     	}
 
-    	session.login(XmppURI.uri(queue, "libraryh3lp.com", "android"), password);
+    	session.login(XmppURI.uri(queue, Settings.getServer(this), "android"), password);
     }
 
     private void enqueue(String phone, String text) {

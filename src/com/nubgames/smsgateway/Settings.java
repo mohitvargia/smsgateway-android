@@ -1,4 +1,4 @@
-package com.libraryh3lp.smsgateway;
+package com.nubgames.smsgateway;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -24,5 +24,9 @@ public class Settings extends PreferenceActivity {
 
     public static boolean getStartup(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("startup", false);
+    }
+    
+    public static String getServer(Context context) {
+    	return PreferenceManager.getDefaultSharedPreferences(context).getString("server", "mycustomercloud.com");
     }
 }

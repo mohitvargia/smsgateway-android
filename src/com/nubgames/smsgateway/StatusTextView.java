@@ -1,4 +1,4 @@
-package com.libraryh3lp.smsgateway;
+package com.nubgames.smsgateway;
 
 import java.util.HashMap;
 import java.util.LinkedList;

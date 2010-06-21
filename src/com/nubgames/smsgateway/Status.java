@@ -1,4 +1,4 @@
-package com.libraryh3lp.smsgateway;
+package com.nubgames.smsgateway;
 
 /**
  * An interface for stateful transitions.

@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"> 
-    <EditTextPreference android:key="queue" android:summary="Set the name of your LibraryH3lp queue." android:title="Queue Name" /><CheckBoxPreference 
+    <ListPreference
+    	android:key="server"
+    	android:summary="Select your chat service provider."
+    	android:title="Server Name"
+    	android:entryValues="@array/server_names"
+    	android:entries="@array/server_labels"
+    	android:defaultValue="mycustomercloud.com"/>
+    <EditTextPreference android:key="queue" android:summary="Set the name of your LibraryH3lp queue." android:title="Queue Name"/>
+    <CheckBoxPreference 
         android:key="startup" 
         android:title="Start Automatically" 
         android:summary="Start gateway when phone starts." 
-        android:defaultValue="false" />
-    
-    
-
+        android:defaultValue="false"/>
 </PreferenceScreen>

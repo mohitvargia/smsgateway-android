@@ -1,4 +1,4 @@
-package com.libraryh3lp.smsgateway;
+package com.nubgames.smsgateway;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
